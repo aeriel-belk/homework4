@@ -26,6 +26,8 @@ library(dplyr)
 library(ggplot2)
 library(lubridate)
 library(tidyr)
+library(broom)
+library(purrr)
 
 ```
   
@@ -58,13 +60,14 @@ onlyunsolved <- homicides %>%
   filter(unsolved == TRUE) %>% 
   ungroup() %>% 
   select(-'unsolved') %>% 
-  rename(unsolved = n)
+  rename(n_unsolved = n)
 
 unsolved <- homicides %>% 
   group_by(city_name) %>% 
   count() %>% 
   ungroup() %>% 
-  left_join(onlyunsolved, by = 'city_name')
+  left_join(onlyunsolved, by = 'city_name') %>% 
+  mutate(n_unsolved = replace(n_unsolved, city_name == 'Tulsa, AL', 0))
 
 head(unsolved)
 ```
@@ -73,17 +76,46 @@ head(unsolved)
 4. For the city of Baltimore, MD, use the prop.test function to estimate the proportion of homicides that are unsolved, as well as the 95% confidence interval for this proportion. Print the output of the prop.test directly in your RMarkdown, and then save the output of prop.test as an R object and apply the tidy function from the broom package to this object and pull the estimated proportion and confidence intervals from the resulting tidy dataframe.
 
 ```{r baltimore}
+baltimore <- filter(unsolved, city_name == 'Baltimore, MD')
 
+baltimore_prop <- prop.test(baltimore$n_unsolved, baltimore$n)
+baltimore_prop
+
+baltimore_prop <- baltimore_prop %>% 
+  tidy()
+
+baltimore_prop
 
 ```
   
+The estimated proportion is `baltimore_prop$estimate` and the estimated confidence interval is `baltimore_prop$conf.low` to `baltimore_prop$conf.high`
+    
+  
+5. Now use what you learned from running prop.test for one city to run prop.test for all the cities. Your goal is to create the figure shown below, where the points show the estimated proportions of unsolved homicides in each city and the horizontal lines show the estimated 95% confidence intervals. Do this all within a “tidy” pipeline, starting from the unsolved dataframe that you created for step 3. 
+
+Use map2 from purrr to apply prop.test within each city and then map from purrr to apply tidy to this output. Use the unnest function from the tidyr package on the resulting list-column (from mapping tidy to the prop.test output list-column), with the option .drop = TRUE, to get your estimates back into a regular tidy data frame before plotting.
+  
+```{r allcities}
+unsolved %>% 
+  map2(, prop.test(x = unsolved$n_unsolved, n = unsolved$n))
+  
+unsolved %>% 
+  map2(.x = unsolved$n_unsolved, .y = unsolved$n, ~ prop.test())
+
+unsolved %>% 
+  map2(n, ~ prop.test(n_unsolved, n = .y))
+
+unsolved$n_unsolved
+?prop.test
+
+
+```
+
+
+6. Create the plot shown below. Hint: Check out the geom_errorbarh geom with the height = 0 option to get the horizontal lines for the confidence intervals.
   
   
-5. Now use what you learned from running prop.test for one city to run prop.test for all the cities. Your goal is to create the figure shown below, where the points show the estimated proportions of unsolved homicides in each city and the horizontal lines show the estimated 95% confidence intervals. Do this all within a “tidy” pipeline, starting from the unsolved dataframe that you created for step 3. Use map2 from purrr to apply prop.test within each city and then map from purrr to apply tidy to this output. Use the unnest function from the tidyr package on the resulting list-column (from mapping tidy to the prop.test output list-column), with the option .drop = TRUE, to get your estimates back into a regular tidy data frame before plotting.
-Create the plot shown below. Hint: Check out the geom_errorbarh geom with the height = 0 option to get the horizontal lines for the confidence intervals.
-  
-  
-6. All of the code for this should be in an RMarkdown document. Render this to a pdf and then push to your GitHub repository. Go on GitHub and make sure that everything made in online.
+7. All of the code for this should be in an RMarkdown document. Render this to a pdf and then push to your GitHub repository. Go on GitHub and make sure that everything made in online.
   
   
   
