@@ -49,7 +49,8 @@ homicides <- homicides %>%
 3. Create a dataframe called unsolved with one row per city that gives the total number of homicides for the city and the number of unsolved homicides (those for which the disposition is “Closed without arrest” or “Open/No arrest”).
   
 ```{r newdf}
-unsolved <- homicides %>% 
+
+onlyunsolved <- homicides %>% 
   mutate(unsolved = disposition == 'Closed without arrest' |
            disposition == 'Open/No arrest') %>% 
   group_by(city_name, unsolved) %>% 
@@ -59,11 +60,22 @@ unsolved <- homicides %>%
   select(-'unsolved') %>% 
   rename(unsolved = n)
 
-unsolved
-```
+unsolved <- homicides %>% 
+  group_by(city_name) %>% 
+  count() %>% 
+  ungroup() %>% 
+  left_join(onlyunsolved, by = 'city_name')
 
+head(unsolved)
+```
+  
 
 4. For the city of Baltimore, MD, use the prop.test function to estimate the proportion of homicides that are unsolved, as well as the 95% confidence interval for this proportion. Print the output of the prop.test directly in your RMarkdown, and then save the output of prop.test as an R object and apply the tidy function from the broom package to this object and pull the estimated proportion and confidence intervals from the resulting tidy dataframe.
+
+```{r baltimore}
+
+
+```
   
   
   
