@@ -22,18 +22,30 @@ list.files('../data')
   
 ```{r libraries, message=FALSE, warning=FALSE}
 library(readr)
+library(dplyr)
+library(ggplot2)
+library(lubridate)
+library(tidyr)
 
 ```
   
 1. Read in the data as an R object named homicides.
 
-```{r reading}
+```{r reading, message=FALSE, warning=FALSE}
+
 homicides <- read_csv('../data/homicide-data.csv')
 
 ```
 
+2. Create a new column called city_name that combines the city and state like this “Baltimore, MD”.
+  
+```{r cleaning}
 
-Create a new column called city_name that combines the city and state like this “Baltimore, MD”.
+homicides <- homicides %>% 
+  unite(city_name, city, state, sep = ', ', remove = FALSE)
+
+```
+
 Create a dataframe called unsolved with one row per city that gives the total number of homicides for the city and the number of unsolved homicides (those for which the disposition is “Closed without arrest” or “Open/No arrest”).
 For the city of Baltimore, MD, use the prop.test function to estimate the proportion of homicides that are unsolved, as well as the 95% confidence interval for this proportion. Print the output of the prop.test directly in your RMarkdown, and then save the output of prop.test as an R object and apply the tidy function from the broom package to this object and pull the estimated proportion and confidence intervals from the resulting tidy dataframe.
 Now use what you learned from running prop.test for one city to run prop.test for all the cities. Your goal is to create the figure shown below, where the points show the estimated proportions of unsolved homicides in each city and the horizontal lines show the estimated 95% confidence intervals. Do this all within a “tidy” pipeline, starting from the unsolved dataframe that you created for step 3. Use map2 from purrr to apply prop.test within each city and then map from purrr to apply tidy to this output. Use the unnest function from the tidyr package on the resulting list-column (from mapping tidy to the prop.test output list-column), with the option .drop = TRUE, to get your estimates back into a regular tidy data frame before plotting.
