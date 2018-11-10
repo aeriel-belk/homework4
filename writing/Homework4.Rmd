@@ -2,7 +2,7 @@
 title: "Homework4"
 author: "Aeriel Belk"
 date: "10/24/2018"
-output: html_document
+output: word
 ---
 
 ```{r setup, include=FALSE}
@@ -133,7 +133,7 @@ unsolved %>%
   
 7. All of the code for this should be in an RMarkdown document. Render this to a pdf and then push to your GitHub repository. Go on GitHub and make sure that everything made in online.
 
-**Note** I can't knit to pdf. It doesn't work on my computer for some reason I don't understand.
+**Note** I can't knit to pdf. It doesn't work on my computer for some reason I don't understand. So, I just knit to word, I hope you understand! Thanks!
   
   
   
