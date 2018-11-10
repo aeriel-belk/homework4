@@ -96,18 +96,15 @@ The estimated proportion is `baltimore_prop$estimate` and the estimated confiden
 Use map2 from purrr to apply prop.test within each city and then map from purrr to apply tidy to this output. Use the unnest function from the tidyr package on the resulting list-column (from mapping tidy to the prop.test output list-column), with the option .drop = TRUE, to get your estimates back into a regular tidy data frame before plotting.
   
 ```{r allcities}
-unsolved %>% 
-  map2(, prop.test(x = unsolved$n_unsolved, n = unsolved$n))
-  
+
 unsolved %>% 
   map2(.x = unsolved$n_unsolved, .y = unsolved$n, ~ prop.test())
 
 unsolved %>% 
-  map2(n, ~ prop.test(n_unsolved, n = .y))
-
-unsolved$n_unsolved
-?prop.test
-
+  mutate(prop_results = map2(.x = n_unsolved, .y = n, .f = prop.test),
+         prop_results = map(.x = prop_results, .f = tidy)) %>% 
+  unnest(prop_results, .drop = TRUE) %>% 
+  select(city_name, estimate, conf.low, conf.high)
 
 ```
 
