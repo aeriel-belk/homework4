@@ -28,7 +28,6 @@ library(lubridate)
 library(tidyr)
 library(broom)
 library(purrr)
-library(forcats)
 library(scales)
 
 ```
@@ -112,7 +111,7 @@ unsolved
 
 6. Create the plot shown below. Hint: Check out the geom_errorbarh geom with the height = 0 option to get the horizontal lines for the confidence intervals.
 
-```{r plotting, fig.height=8, fig.width=4} 
+```{r plotting, fig.height=8, fig.width=4.5} 
 
 unsolved %>% 
   filter(city_name != 'Tulsa, AL') %>% 
